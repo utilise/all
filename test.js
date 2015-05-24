@@ -1,6 +1,7 @@
 var expect = require('chai').expect
-  , all = require('./')
-  , is = require('is')
+  , key    = require('key')
+  , all    = require('./')
+  , is     = require('is')
 
 describe('all', function() {
 
@@ -18,11 +19,21 @@ describe('all', function() {
     var selector = '.class'
       , result 
       , fn = function(selector){ result = selector; return arguments }
-      , doc = { querySelectorAll: fn }
-
-    global.document = doc
+      
+    key('document.head.createShadowRoot', false)(global)
+    key('document.querySelectorAll', fn)(global)
     expect(is.arr(all(selector))).to.be.true
     expect(result).to.equal(selector)
   })
 
+  it('should call querySelectorAll with selector and global document and prefix', function(){
+    var selector = '.class'
+      , result 
+      , fn = function(selector){ result = selector; return arguments }
+      
+    key('document.head.createShadowRoot', true)(global)
+    key('document.querySelectorAll', fn)(global)
+    expect(is.arr(all(selector))).to.be.true
+    expect(result).to.equal('html /deep/ ' + selector)
+  })
 })
