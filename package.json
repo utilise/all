@@ -12,14 +12,14 @@
     "chai": "^2.3.0",
     "client": "git://github.com/utilise/client",
     "coveralls": "^2.11.2",
-    "is": "git://github.com/utilise/is",
+    "is": "git+https://github.com/utilise/is.git",
     "istanbul": "^0.3.13",
     "jsdom": "^5.4.3",
     "mocha": "^2.2.4",
     "mocha-lcov-reporter": "0.0.2"
   },
   "dependencies": {
-    "to": "git://github.com/utilise/to",
-    "key": "git://github.com/utilise/key"
+    "to": "git+https://github.com/utilise/to.git"
+  , "key": "git+https://github.com/utilise/key.git"
   }
 }
