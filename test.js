@@ -1,39 +1,48 @@
 var expect = require('chai').expect
+  , client = require('client')
+  , shim   = !client && polyfill()
   , key    = require('key')
   , all    = require('./')
   , is     = require('is')
+  , node
 
 describe('all', function() {
+  
+  before(function(){
+    /* istanbul ignore next */
+    if (!client) { return node = document.body.firstElementChild }
+    else {
+      node = document.body.appendChild(document.createElement('div'))
+      node.className = 'class-all'
+      node.appendChild(document.createElement('li'))
+    }
+  })
 
   it('should call querySelectorAll with selector', function(){
-    var selector = '.class'
-      , result 
-      , fn = function(selector){ result = selector; return arguments }
-      , doc = { querySelectorAll: fn }
-
-    expect(is.arr(all(selector, doc))).to.be.true
-    expect(result).to.equal(selector)
+    expect(all('.class-all li', node)).to.be.eql([node.firstElementChild])
   })
 
-  it('should call querySelectorAll with selector and global document', function(){
-    var selector = '.class'
-      , result 
-      , fn = function(selector){ result = selector; return arguments }
-      
-    key('document.head.createShadowRoot', false)(global)
-    key('document.querySelectorAll', fn)(global)
-    expect(is.arr(all(selector))).to.be.true
-    expect(result).to.equal(selector)
+  it('should call querySelectorAll with selector and global document', function(){     
+    expect(all('.class-all')).to.be.eql([node])
   })
 
-  it('should call querySelectorAll with selector and global document and prefix', function(){
-    var selector = '.class'
+  it('should pierce boundaries if supports shadow dom', function(){
+    var realShadow = document.head.createShadowRoot
+      , realQuery = document.querySelectorAll
       , result 
-      , fn = function(selector){ result = selector; return arguments }
-      
-    key('document.head.createShadowRoot', true)(global)
-    key('document.querySelectorAll', fn)(global)
-    expect(is.arr(all(selector))).to.be.true
-    expect(result).to.equal('html /deep/ ' + selector)
+
+    document.querySelectorAll = function(selector){ result = selector; return [] }
+    document.head.createShadowRoot = true
+    all('.class-all li')
+    expect(result).to.be.eql('html /deep/ .class-all li')
+
+    document.head.createShadowRoot = realShadow
+    document.querySelectorAll = realQuery
   })
+
 })
+
+function polyfill(){
+  window = require("jsdom").jsdom('<div class="class-all"><li></li></div>').defaultView
+  global.document = window.document
+}
