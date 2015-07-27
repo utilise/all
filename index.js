@@ -1,4 +1,4 @@
-var to = require('to')
+var to = require('utilise.to')
 
 module.exports = function all(selector, doc){
   var prefix = !doc && document.head.createShadowRoot ? 'html /deep/ ' : ''
